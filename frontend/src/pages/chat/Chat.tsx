@@ -28,10 +28,13 @@ const Chat = () => {
     const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
     const [activeCitation, setActiveCitation] = useState<[content: string, id: string, title: string, filepath: string, url: string, metadata: string]>();
     const [isCitationPanelOpen, setIsCitationPanelOpen] = useState<boolean>(false);
-    const [answers, setAnswers] = useState<ChatMessage[]>([]);
     const abortFuncs = useRef([] as AbortController[]);
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
-    
+    const [answers, setAnswers] = useState<ChatMessage[]>(() => {
+    // Retrieve chat messages from local storage when initializing state
+    const savedMessages = localStorage.getItem("chatMessages");
+    return savedMessages ? JSON.parse(savedMessages) : [];
+});
     const getUserInfoList = async () => {
         const userInfoList = await getUserInfo();
         if (userInfoList.length === 0 && window.location.hostname !== "127.0.0.1") {
@@ -77,13 +80,22 @@ const Chat = () => {
                             runningText += obj;
                             result = JSON.parse(runningText);
                             setShowLoadingMessage(false);
-                            setAnswers([...answers, userMessage, ...result.choices[0].messages]);
+                            setAnswers((prevAnswers) => {
+                                const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                                localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
+                                return newAnswers;
+                            });
+
                             runningText = "";
                         }
                         catch { }
                     });
                 }
-                setAnswers([...answers, userMessage, ...result.choices[0].messages]);
+                setAnswers((prevAnswers) => {
+                    const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                    localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
+                    return newAnswers;
+                });
             }
             
         } catch ( e )  {
@@ -116,7 +128,9 @@ const Chat = () => {
         lastQuestionRef.current = "";
         setActiveCitation(undefined);
         setAnswers([]);
+        localStorage.removeItem("chatMessages");  // Clear from local storage
     };
+
 
     const stopGenerating = () => {
         abortFuncs.current.forEach(a => a.abort());
