@@ -35,6 +35,7 @@ const Chat = () => {
     const savedMessages = localStorage.getItem("chatMessages");
     return savedMessages ? JSON.parse(savedMessages) : [];
 });
+    console.log("Initial answers from localStorage:", answers);
     const getUserInfoList = async () => {
         const userInfoList = await getUserInfo();
         if (userInfoList.length === 0 && window.location.hostname !== "127.0.0.1") {
@@ -85,6 +86,7 @@ const Chat = () => {
                                 localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
                                 return newAnswers;
                             });
+                            console.log("Saved to localStorage:", newAnswers);
 
                             runningText = "";
                         }
