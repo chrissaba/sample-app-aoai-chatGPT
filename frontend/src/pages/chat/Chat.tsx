@@ -32,7 +32,7 @@ const Chat = () => {
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
     const [answers, setAnswers] = useState<ChatMessage[]>(() => {
     // Retrieve chat messages from local storage when initializing state
-    const savedMessages = localStorage.getItem("chatMessages");
+    const savedMessages = JSON.parse(localStorage.getItem("chatMessages"));
     return savedMessages ? JSON.parse(savedMessages) : [];
 });
     console.log("Initial answers from localStorage:", answers);
@@ -81,11 +81,15 @@ const Chat = () => {
                             runningText += obj;
                             result = JSON.parse(runningText);
                             setShowLoadingMessage(false);
-                            setAnswers((prevAnswers) => {
-                                const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
-                                localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
-                                return newAnswers;
-                            });
+                            setAnswers(prevAnswers => {
+                                const newAnswers = [
+                                  ...prevAnswers, 
+                                  userMessage,
+                                  ...result.choices[0].messages
+                                ];
+                              
+                                return newAnswers; 
+                              })
                             console.log("Saved to localStorage:", newAnswers);
 
                             runningText = "";
@@ -93,11 +97,14 @@ const Chat = () => {
                         catch { }
                     });
                 }
-                setAnswers((prevAnswers) => {
-                    const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
-                    localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
-                    return newAnswers;
-                });
+                let newAnswers;
+
+                setAnswers(prevAnswers => {
+                  newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                
+                  return newAnswers;
+                });                
+
             }
             
         } catch ( e )  {
@@ -122,7 +129,9 @@ const Chat = () => {
             setShowLoadingMessage(false);
             abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
         }
-
+        useEffect(() => {
+            localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
+          }, [newAnswers]);
         return abortController.abort();
     };
 
