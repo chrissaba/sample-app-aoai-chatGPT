@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 from flask import session
 from uuid import uuid4
 
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecretkey")  # Ideally, get this from an environment variable or a secure source.
+
 
 load_dotenv()
 
 app = Flask(__name__, static_folder="static")
-
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecretkey")  # Ideally, get this from an environment variable or a secure source.
 # Static Files
 @app.route("/")
 def index():
