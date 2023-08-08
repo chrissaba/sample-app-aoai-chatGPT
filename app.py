@@ -5,6 +5,10 @@ import requests
 import openai
 from flask import Flask, Response, request, jsonify, send_from_directory
 from dotenv import load_dotenv
+from flask import session
+from uuid import uuid4
+
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecretkey")  # Ideally, get this from an environment variable or a secure source.
 
 load_dotenv()
 
@@ -245,6 +249,22 @@ def conversation_without_data(request):
 @app.route("/conversation", methods=["GET", "POST"])
 def conversation():
     try:
+        # Initialize session if not already done
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid4())
+        
+        # Retrieve existing messages from the session
+        existing_messages = session.get('chat_messages', [])
+
+        # Append new message from the current request
+        if request.method == "POST":
+            new_message = request.json["messages"][-1]  # Assuming the last message is the new one
+            existing_messages.append(new_message)
+            session['chat_messages'] = existing_messages
+
+        # Modify the request to include all messages from the session
+        request.json["messages"] = existing_messages
+
         use_data = should_use_data()
         if use_data:
             return conversation_with_data(request)
@@ -253,6 +273,7 @@ def conversation():
     except Exception as e:
         logging.exception("Exception in /conversation")
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run()
