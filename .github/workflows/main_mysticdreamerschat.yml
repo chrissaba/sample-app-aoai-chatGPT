@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'mysticdreamerschat'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6A8E0B0B57E643309907262D84723E1B }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_937681CAD5F34A82A41B95AFCBBCBEE1 }}
