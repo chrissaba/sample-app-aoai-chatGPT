@@ -130,8 +130,8 @@ const Chat = () => {
             abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
         }
         useEffect(() => {
-            localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
-          }, [newAnswers]);
+            localStorage.setItem('chatMessages', JSON.stringify(answers));
+          }, [answers]);
         return abortController.abort();
     };
 
