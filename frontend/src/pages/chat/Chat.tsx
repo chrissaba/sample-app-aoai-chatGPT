@@ -22,6 +22,7 @@ import { Answer } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 
 const Chat = () => {
+    const [enableSaving, setEnableSaving] = useState(false);
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -90,21 +91,19 @@ const Chat = () => {
                               
                                 return newAnswers; 
                               })
-                            console.log("Saved to localStorage:", newAnswers);
+                            console.log("Saved to localStorage:", answers);
 
                             runningText = "";
                         }
                         catch { }
                     });
                 }
-                let newAnswers;
 
-                setAnswers(prevAnswers => {
-                  newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
-                
-                  return newAnswers;
-                });                
-
+                setAnswers(prevAnswers => [
+                    ...prevAnswers, 
+                    userMessage,
+                    ...result.choices[0].messages
+                  ]);
             }
             
         } catch ( e )  {
@@ -129,9 +128,7 @@ const Chat = () => {
             setShowLoadingMessage(false);
             abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
         }
-        useEffect(() => {
-            localStorage.setItem('chatMessages', JSON.stringify(answers));
-          }, [answers]);
+
         return abortController.abort();
     };
 
@@ -140,8 +137,13 @@ const Chat = () => {
         setActiveCitation(undefined);
         setAnswers([]);
         localStorage.removeItem("chatMessages");  // Clear from local storage
+        setEnableSaving(false);
     };
-
+    useEffect(() => {
+        if (enableSaving) {
+          localStorage.setItem('chatMessages', JSON.stringify(answers))  
+        }
+      }, [answers, enableSaving])
 
     const stopGenerating = () => {
         abortFuncs.current.forEach(a => a.abort());
@@ -247,7 +249,9 @@ const Chat = () => {
                                 <div ref={chatMessageStreamEnd} />
                             </div>
                         )}
-
+                        <button onClick={() => setEnableSaving(true)}>
+                            Save History
+                        </button>
                         <Stack horizontal className={styles.chatInput}>
                             {isLoading && (
                                 <Stack 
