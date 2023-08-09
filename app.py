@@ -8,8 +8,6 @@ from dotenv import load_dotenv
 from flask import session
 from uuid import uuid4
 
-
-
 load_dotenv()
 
 app = Flask(__name__, static_folder="static")
