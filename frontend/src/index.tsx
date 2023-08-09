@@ -8,6 +8,7 @@ import "./index.css";
 import Layout from "./pages/layout/Layout";
 import NoPage from "./pages/NoPage";
 import Chat from "./pages/chat/Chat";
+import ChatManager from "./pages/chat/ChatManager";
 
 initializeIcons();
 
@@ -29,3 +30,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <App />
     </React.StrictMode>
 );
+// index.tsx 
+
+<Route index element={<ChatManager />} />

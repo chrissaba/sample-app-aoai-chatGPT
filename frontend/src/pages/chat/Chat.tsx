@@ -311,3 +311,21 @@ const Chat = () => {
 };
 
 export default Chat;
+
+interface Props {
+    chat: ChatMessage[];
+    setChat: (chat: ChatMessage[]) => void;
+  }
+  
+
+  export default function NewChat({chat, setChat}: Props) {
+
+    // Use chat and setChat props
+    setChat(prevChat => {
+      // update chat state
+    })
+  
+    return (
+      // render UI
+    )
+  }
