@@ -174,7 +174,14 @@ const Chat = () => {
         }
         return [];
     }
-
+    const [isSaving, setIsSaving] = useState(false);
+    const saveChatHistory = () => {
+        setIsSaving(true);
+      
+        // Save to localStorage
+      
+        setIsSaving(false);
+      }
     return (
         <div className={styles.container} role="main">
             {showAuthMessage ? (
@@ -249,9 +256,6 @@ const Chat = () => {
                                 <div ref={chatMessageStreamEnd} />
                             </div>
                         )}
-                        <button onClick={() => setEnableSaving(true)}>
-                            Save History
-                        </button>
                         <Stack horizontal className={styles.chatInput}>
                             {isLoading && (
                                 <Stack 
@@ -281,6 +285,14 @@ const Chat = () => {
                                     aria-hidden="true"
                                 />
                             </div>
+                            <div>
+                               <button
+                                 onClick={saveChatHistory}
+                                 disabled={isSaving}
+                               >
+                                 {isSaving ? "Saving..." : "Save History"} 
+                               </button>
+                             </div>
                             <QuestionInput
                                 clearOnSend
                                 placeholder="Type a new question..."
