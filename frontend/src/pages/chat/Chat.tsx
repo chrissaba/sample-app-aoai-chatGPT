@@ -67,36 +67,42 @@ const Chat = () => {
             const response = await conversationApi(request, abortController.signal);
             if (response?.body) {                
             const reader = response.body.getReader();
-            let entireResponse = "";
+            let runningText = "";
+            let allNewMessages: ChatMessage[] = [];
+            let lastProcessedPosition = 0; // This variable keeps track of the last processed position
+            
             while (true) {
                 const {done, value} = await reader.read();
                 if (done) break;
-                let text = new TextDecoder("utf-8").decode(value);
-                entireResponse += text;
-            }
-
-            // Log the entire response
-            console.log("entireResponse:", entireResponse);
-
-            // Split and parse each line
-            const lines = entireResponse.trim().split("\n");
-            lines.forEach(line => {
-                try {
-                    result = JSON.parse(line);
-                    console.log("API Response:", result);  // Log the parsed response here
-                    // Process the result here
-                    setAnswers(prevAnswers => {
-                        const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
-                        localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
-                        return newAnswers;
-                    });
-                } catch (error) {
-                    console.error("Error parsing a line in the response:", error, "Line content:", line);
-                }
-            });
-    
-            }
             
+                const entireResponse = new TextDecoder("utf-8").decode(value);
+                
+                // Only process the content after the last processed position
+                const newContent = entireResponse.substring(lastProcessedPosition);
+                const lines = newContent.split("\n");
+                
+                lines.forEach(line => {
+                    try {
+                        result = JSON.parse(line);
+                        allNewMessages.push(...result.choices[0].messages);
+                    } catch (error) {
+                        console.error("Error parsing line:", error);
+                    }
+                });
+                
+                // Update the last processed position
+                lastProcessedPosition = entireResponse.length;
+            }
+            try {
+                setAnswers(prevAnswers => {
+                    const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
+                    localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
+                    return newAnswers;
+                });
+            } catch (error) {
+                console.error("Error setting answers:", error);
+            }
+            }
         } catch ( e )  {
             if (!abortController.signal.aborted) {
                 console.error(result);
