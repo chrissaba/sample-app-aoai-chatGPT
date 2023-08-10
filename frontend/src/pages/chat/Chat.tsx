@@ -83,6 +83,7 @@ const Chat = () => {
             lines.forEach(line => {
                 try {
                     result = JSON.parse(line);
+                    console.log("API Response:", result);  // Log the parsed response here
                     // Process the result here
                     setAnswers(prevAnswers => {
                         const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
