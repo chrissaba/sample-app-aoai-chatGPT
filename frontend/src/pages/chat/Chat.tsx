@@ -72,28 +72,28 @@ const Chat = () => {
                 const reader = response.body.getReader();
                 let runningText = "";
                 let allNewMessages: ChatMessage[] = [];
-                while (true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-                    let text = new TextDecoder("utf-8").decode(value);
-                    const objects = text.split("\n");
-                    objects.forEach((obj) => {
-                        try {
-                            runningText += obj;
-                            result = JSON.parse(runningText);
-                            allNewMessages.push(...result.choices[0].messages);
-                            runningText = "";
-                        }
-                        catch { }
-                    });
-                }
-                console.log("All new messages:", allNewMessages);   // This is the array of messages to add to the state        
-                // After the while loop, update the state once:
-                setAnswers(prevAnswers => {
-                    const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
-                localStorage.setItem('chatMessages', JSON.stringify(newAnswers)); // Setting to localStorage directly here
-                return newAnswers;
-            });
+while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    let text = new TextDecoder("utf-8").decode(value);
+    const objects = text.split("\n");
+    objects.forEach((obj) => {
+        try {
+            runningText += obj;
+            result = JSON.parse(runningText);
+            allNewMessages.push(...result.choices[0].messages);
+            runningText = "";
+        }
+        catch { }
+    });
+}
+
+// After the while loop, update the state once:
+setAnswers(prevAnswers => {
+    const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
+    localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
+    return newAnswers;
+});
 
 
             }
