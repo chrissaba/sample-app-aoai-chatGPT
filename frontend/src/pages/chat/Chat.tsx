@@ -31,10 +31,11 @@ const Chat = () => {
     const abortFuncs = useRef([] as AbortController[]);
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
     const [answers, setAnswers] = useState<ChatMessage[]>(() => {
-    // Retrieve chat messages from local storage when initializing state
-    const savedMessages = JSON.parse(localStorage.getItem("chatMessages"));
-    return savedMessages ? JSON.parse(savedMessages) : [];
-});
+        // Retrieve chat messages from local storage when initializing state
+        const savedMessages = localStorage.getItem("chatMessages");
+        return savedMessages ? JSON.parse(savedMessages) : [];
+    });
+
     console.log("Initial answers from localStorage:", answers);
     const getUserInfoList = async () => {
         const userInfoList = await getUserInfo();
@@ -73,7 +74,7 @@ const Chat = () => {
                 while (true) {
                     const {done, value} = await reader.read();
                     if (done) break;
-
+                    let newAnswers: string[];
                     var text = new TextDecoder("utf-8").decode(value);
                     const objects = text.split("\n");
                     objects.forEach((obj) => {
@@ -130,8 +131,8 @@ const Chat = () => {
             abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
         }
         useEffect(() => {
-            localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
-          }, [newAnswers]);
+            localStorage.setItem('chatMessages', JSON.stringify(answers));
+          }, [answers]);
         return abortController.abort();
     };
 
