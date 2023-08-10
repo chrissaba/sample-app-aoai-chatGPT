@@ -33,7 +33,7 @@ const Chat = () => {
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
     const [answers, setAnswers] = useState<ChatMessage[]>(() => {
     // Retrieve chat messages from local storage when initializing state
-    const savedMessages = JSON.parse(localStorage.getItem("chatMessages"));
+    const savedMessages = localStorage.getItem("chatMessages");
     return savedMessages ? JSON.parse(savedMessages) : [];
 });
     console.log("Initial answers from localStorage:", answers);
@@ -82,6 +82,7 @@ const Chat = () => {
                             runningText += obj;
                             result = JSON.parse(runningText);
                             setShowLoadingMessage(false);
+<<<<<<< HEAD
                             setAnswers(prevAnswers => {
                                 const newAnswers = [
                                   ...prevAnswers, 
@@ -92,18 +93,34 @@ const Chat = () => {
                                 return newAnswers; 
                               })
                             console.log("Saved to localStorage:", answers);
+=======
+                            setAnswers((prevAnswers) => {
+                                const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                                localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
+                                return newAnswers;
+                            });
+                            console.log("Saved to localStorage:", newAnswers);
+>>>>>>> parent of 6c2a7e1 (commit)
 
                             runningText = "";
                         }
                         catch { }
                     });
                 }
+<<<<<<< HEAD
 
                 setAnswers(prevAnswers => [
                     ...prevAnswers, 
                     userMessage,
                     ...result.choices[0].messages
                   ]);
+=======
+                setAnswers((prevAnswers) => {
+                    const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                    localStorage.setItem("chatMessages", JSON.stringify(newAnswers));  // Save to local storage
+                    return newAnswers;
+                });
+>>>>>>> parent of 6c2a7e1 (commit)
             }
             
         } catch ( e )  {
