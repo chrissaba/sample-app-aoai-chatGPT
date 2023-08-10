@@ -65,27 +65,34 @@ const Chat = () => {
     
         try {
             const response = await conversationApi(request, abortController.signal);
-            if (response?.body) {
-                
-                const reader = response.body.getReader();
-                let entireResponse = "";
-                while (true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-                    let text = new TextDecoder("utf-8").decode(value);
-                    entireResponse += text;
-                }
-                
+            if (response?.body) {                
+            const reader = response.body.getReader();
+            let entireResponse = "";
+            while (true) {
+                const {done, value} = await reader.read();
+                if (done) break;
+                let text = new TextDecoder("utf-8").decode(value);
+                entireResponse += text;
+            }
+
+            // Log the entire response
+            console.log("entireResponse:", entireResponse);
+
+            // Split and parse each line
+            const lines = entireResponse.trim().split("\n");
+            lines.forEach(line => {
                 try {
-                    const result = JSON.parse(entireResponse);
+                    result = JSON.parse(line);
+                    // Process the result here
                     setAnswers(prevAnswers => {
                         const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
                         localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
                         return newAnswers;
                     });
                 } catch (error) {
-                    console.error("Error parsing the response:", error);
+                    console.error("Error parsing a line in the response:", error, "Line content:", line);
                 }
+            });
     
             }
             
