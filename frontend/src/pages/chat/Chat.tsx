@@ -46,56 +46,47 @@ const Chat = () => {
             setShowAuthMessage(false);
         }
     }
-
     const makeApiRequest = async (question: string) => {
         lastQuestionRef.current = question;
-
+        let result = {} as ChatResponse;
         setIsLoading(true);
         setShowLoadingMessage(true);
         const abortController = new AbortController();
         abortFuncs.current.unshift(abortController);
-
+    
         const userMessage: ChatMessage = {
             role: "user",
             content: question
         };
-
+    
         const request: ConversationRequest = {
             messages: [...answers.filter((answer) => answer.role !== "error"), userMessage]
         };
-
-        let result = {} as ChatResponse;
+    
         try {
             const response = await conversationApi(request, abortController.signal);
             if (response?.body) {
                 
                 const reader = response.body.getReader();
-                let runningText = "";
-                let allNewMessages: ChatMessage[] = [];
-while (true) {
-    const {done, value} = await reader.read();
-    if (done) break;
-    let text = new TextDecoder("utf-8").decode(value);
-    const objects = text.split("\n");
-    objects.forEach((obj) => {
-        try {
-            runningText += obj;
-            result = JSON.parse(runningText);
-            allNewMessages.push(...result.choices[0].messages);
-            runningText = "";
-        }
-        catch { }
-    });
-}
-
-// After the while loop, update the state once:
-setAnswers(prevAnswers => {
-    const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
-    localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
-    return newAnswers;
-});
-
-
+                let entireResponse = "";
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    let text = new TextDecoder("utf-8").decode(value);
+                    entireResponse += text;
+                }
+                
+                try {
+                    const result = JSON.parse(entireResponse);
+                    setAnswers(prevAnswers => {
+                        const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
+                        localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
+                        return newAnswers;
+                    });
+                } catch (error) {
+                    console.error("Error parsing the response:", error);
+                }
+    
             }
             
         } catch ( e )  {
