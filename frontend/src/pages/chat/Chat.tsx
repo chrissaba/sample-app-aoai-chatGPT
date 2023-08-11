@@ -67,32 +67,27 @@ const Chat = () => {
             const response = await conversationApi(request, abortController.signal);
             if (response?.body) {                
             const reader = response.body.getReader();
-            let runningText = "";
             let allNewMessages: ChatMessage[] = [];
-            let lastProcessedPosition = 0; // This variable keeps track of the last processed position
-            
+            let accumulatedData = "";  // This will store chunks until we have a full message
             while (true) {
-                const {done, value} = await reader.read();
+                const { done, value } = await reader.read();
                 if (done) break;
             
-                const entireResponse = new TextDecoder("utf-8").decode(value);
-                
-                // Only process the content after the last processed position
-                const newContent = entireResponse.substring(lastProcessedPosition);
-                const lines = newContent.split("\n");
-                
-                lines.forEach(line => {
+                const chunk = new TextDecoder("utf-8").decode(value);
+                accumulatedData += chunk;
+            
+                // This is a simplistic way to determine end of a message. Modify as needed.
+                if (accumulatedData.endsWith("\n")) {  
                     try {
-                        result = JSON.parse(line);
+                        result = JSON.parse(accumulatedData);
                         allNewMessages.push(...result.choices[0].messages);
+                        accumulatedData = "";  // Reset for next message
                     } catch (error) {
-                        console.error("Error parsing line:", error);
+                        console.error("Error parsing accumulated data:", error);
                     }
-                });
-                
-                // Update the last processed position
-                lastProcessedPosition = entireResponse.length;
+                }
             }
+            
             try {
                 setAnswers(prevAnswers => {
                     const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
