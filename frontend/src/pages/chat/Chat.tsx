@@ -29,6 +29,7 @@ const Chat = () => {
     const [activeCitation, setActiveCitation] = useState<[content: string, id: string, title: string, filepath: string, url: string, metadata: string]>();
     const [isCitationPanelOpen, setIsCitationPanelOpen] = useState<boolean>(false);
     const abortFuncs = useRef([] as AbortController[]);
+    const [realTimeMessage, setRealTimeMessage] = useState<string>(""); 
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
     const [answers, setAnswers] = useState<ChatMessage[]>(() => {
         // Retrieve chat messages from local storage when initializing state
@@ -53,7 +54,7 @@ const Chat = () => {
         setShowLoadingMessage(true);
         const abortController = new AbortController();
         abortFuncs.current.unshift(abortController);
-    
+
         const userMessage: ChatMessage = {
             role: "user",
             content: question
@@ -67,17 +68,18 @@ const Chat = () => {
             const response = await conversationApi(request, abortController.signal);
             if (response?.body) {                
             const reader = response.body.getReader();
-            let allNewMessages: ChatMessage[] = [];
-            let accumulatedData = "";  // This will store chunks until we have a full message
+            let allNewMessages: ChatMessage[] = [];let accumulatedData = "";
+
             while (true) {
-                const { done, value } = await reader.read();
+                const {done, value} = await reader.read();
                 if (done) break;
             
                 const chunk = new TextDecoder("utf-8").decode(value);
                 accumulatedData += chunk;
+                
+                setRealTimeMessage(accumulatedData);  // Update real-time message in UI
             
-                // This is a simplistic way to determine end of a message. Modify as needed.
-                if (accumulatedData.endsWith("\n")) {  
+                if (accumulatedData.endsWith("\n")) {  // Assuming newline denotes end of message
                     try {
                         result = JSON.parse(accumulatedData);
                         allNewMessages.push(...result.choices[0].messages);
@@ -88,12 +90,14 @@ const Chat = () => {
                 }
             }
             
-            try {
+            try {// After the while loop
                 setAnswers(prevAnswers => {
                     const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
                     localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
                     return newAnswers;
                 });
+                setRealTimeMessage("");  // Reset real-time message
+                
             } catch (error) {
                 console.error("Error setting answers:", error);
             }
@@ -225,14 +229,14 @@ const Chat = () => {
                                         <div className={styles.chatMessageGpt}>
                                             <Answer
                                                 answer={{
-                                                    answer: "Generating answer...",
+                                                    answer: realTimeMessage,
                                                     citations: []
                                                 }}
                                                 onCitationClicked={() => null}
                                             />
                                         </div>
                                     </>
-                                )}
+                                )}                                
                                 <div ref={chatMessageStreamEnd} />
                             </div>
                         )}
