@@ -28,16 +28,14 @@ const Chat = () => {
     const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
     const [activeCitation, setActiveCitation] = useState<[content: string, id: string, title: string, filepath: string, url: string, metadata: string]>();
     const [isCitationPanelOpen, setIsCitationPanelOpen] = useState<boolean>(false);
-    const abortFuncs = useRef([] as AbortController[]);
-    const [realTimeMessage, setRealTimeMessage] = useState<string>(""); 
-    const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
     const [answers, setAnswers] = useState<ChatMessage[]>(() => {
-        // Retrieve chat messages from local storage when initializing state
         const savedMessages = localStorage.getItem("chatMessages");
         return savedMessages ? JSON.parse(savedMessages) : [];
     });
-
-    console.log("Initial answers from localStorage:", answers);
+    
+    const abortFuncs = useRef([] as AbortController[]);
+    const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
+    
     const getUserInfoList = async () => {
         const userInfoList = await getUserInfo();
         if (userInfoList.length === 0 && window.location.hostname !== "127.0.0.1") {
@@ -47,9 +45,10 @@ const Chat = () => {
             setShowAuthMessage(false);
         }
     }
+
     const makeApiRequest = async (question: string) => {
         lastQuestionRef.current = question;
-        let result = {} as ChatResponse;
+
         setIsLoading(true);
         setShowLoadingMessage(true);
         const abortController = new AbortController();
@@ -59,49 +58,42 @@ const Chat = () => {
             role: "user",
             content: question
         };
-    
+
         const request: ConversationRequest = {
             messages: [...answers.filter((answer) => answer.role !== "error"), userMessage]
         };
-    
+
+        let result = {} as ChatResponse;
         try {
             const response = await conversationApi(request, abortController.signal);
-            if (response?.body) {                
-            const reader = response.body.getReader();
-            let allNewMessages: ChatMessage[] = [];let accumulatedData = "";
-
-            while (true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-            
-                const chunk = new TextDecoder("utf-8").decode(value);
-                accumulatedData += chunk;
+            if (response?.body) {
                 
-                setRealTimeMessage(accumulatedData);  // Update real-time message in UI
-            
-                if (accumulatedData.endsWith("\n")) {  // Assuming newline denotes end of message
-                    try {
-                        result = JSON.parse(accumulatedData);
-                        allNewMessages.push(...result.choices[0].messages);
-                        accumulatedData = "";  // Reset for next message
-                    } catch (error) {
-                        console.error("Error parsing accumulated data:", error);
-                    }
-                }
-            }
-            
-            try {// After the while loop
+                const reader = response.body.getReader();
+                let runningText = "";
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+
+                    var text = new TextDecoder("utf-8").decode(value);
+                    const objects = text.split("\n");
+                    objects.forEach((obj) => {
+                        try {
+                            runningText += obj;
+                            result = JSON.parse(runningText);
+                            setShowLoadingMessage(false);
+                            runningText = "";
+                        }
+                        catch { }
+                    });
+                }// After the while loop
                 setAnswers(prevAnswers => {
-                    const newAnswers = [...prevAnswers, userMessage, ...allNewMessages];
+                    const newAnswers = [...prevAnswers, userMessage, ...result.choices[0].messages];
                     localStorage.setItem('chatMessages', JSON.stringify(newAnswers));
                     return newAnswers;
                 });
-                setRealTimeMessage("");  // Reset real-time message
-                
-            } catch (error) {
-                console.error("Error setting answers:", error);
+
             }
-            }
+            
         } catch ( e )  {
             if (!abortController.signal.aborted) {
                 console.error(result);
@@ -124,7 +116,7 @@ const Chat = () => {
             setShowLoadingMessage(false);
             abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
         }
-        
+
         return abortController.abort();
     };
 
@@ -132,9 +124,7 @@ const Chat = () => {
         lastQuestionRef.current = "";
         setActiveCitation(undefined);
         setAnswers([]);
-        localStorage.removeItem("chatMessages");  // Clear from local storage
     };
-
 
     const stopGenerating = () => {
         abortFuncs.current.forEach(a => a.abort());
@@ -191,7 +181,7 @@ const Chat = () => {
                                     className={styles.chatIcon}
                                     aria-hidden="true"
                                 />
-                                <h1 className={styles.chatEmptyStateTitle}>Bizdev Buddy</h1>
+                                <h1 className={styles.chatEmptyStateTitle}>Start chatting</h1>
                                 <h2 className={styles.chatEmptyStateSubtitle}>This chatbot is configured to answer your questions</h2>
                             </Stack>
                         ) : (
@@ -229,17 +219,15 @@ const Chat = () => {
                                         <div className={styles.chatMessageGpt}>
                                             <Answer
                                                 answer={{
-                                                    answer: realTimeMessage,
+                                                    answer: "Generating answer...",
                                                     citations: []
                                                 }}
                                                 onCitationClicked={() => null}
                                             />
                                         </div>
                                     </>
-                                )}                                
-                                <div ref={chatMessageStreamEnd} />
-                            </div>
-                        )}
+                                )}
+                                
 
                         <Stack horizontal className={styles.chatInput}>
                             {isLoading && (
