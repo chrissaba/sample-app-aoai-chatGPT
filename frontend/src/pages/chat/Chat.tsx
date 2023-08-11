@@ -174,16 +174,16 @@ const Chat = () => {
             ) : (
                 <Stack horizontal className={styles.chatRoot}>
                     <div className={styles.chatContainer}>
-                        {!lastQuestionRef.current ? (
-                            <Stack className={styles.chatEmptyState}>
-                                <img
-                                    src={Azure}
-                                    className={styles.chatIcon}
-                                    aria-hidden="true"
-                                />
-                                <h1 className={styles.chatEmptyStateTitle}>Start chatting</h1>
-                                <h2 className={styles.chatEmptyStateSubtitle}>This chatbot is configured to answer your questions</h2>
-                            </Stack>
+                    {answers.length === 0 ? (
+                        <Stack className={styles.chatEmptyState}>
+                            <img
+                                src={Azure}
+                                className={styles.chatIcon}
+                                aria-hidden="true"
+                            />
+                            <h1 className={styles.chatEmptyStateTitle}>Bizdev Buddy</h1>
+                            <h2 className={styles.chatEmptyStateSubtitle}>This chatbot is configured to answer your questions</h2>
+                        </Stack>
                         ) : (
                             <div className={styles.chatMessageStream} style={{ marginBottom: isLoading ? "40px" : "0px"}} role="log">
                                 {answers.map((answer, index) => (
