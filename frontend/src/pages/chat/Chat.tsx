@@ -226,8 +226,10 @@ const Chat = () => {
                                             />
                                         </div>
                                     </>
-                                )}
-                                
+                                )}                                
+                                <div ref={chatMessageStreamEnd} />
+                            </div>
+                        )}
 
                         <Stack horizontal className={styles.chatInput}>
                             {isLoading && (
