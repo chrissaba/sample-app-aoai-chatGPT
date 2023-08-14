@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 180.88 259.07">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-4 {
+        fill: #00b5eb;
+      }
+
+      .cls-5 {
+        fill: url(#linear-gradient-3);
+      }
+
+      .cls-6 {
+        fill: url(#linear-gradient-4);
+      }
+
+      .cls-7 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-2 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-1" width="180.87" height="259.07"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="0" y1="158.49" x2="19.23" y2="158.49" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5f5ba8"/>
+      <stop offset=".49" stop-color="#5f5ba8"/>
+      <stop offset="1" stop-color="#343466"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="161.64" y1="158.48" x2="180.88" y2="158.48" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="5.75" y1="176.57" x2="174.15" y2="176.57" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-4" x1="76.02" y1="-.2" x2="96.27" y2="93.11" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5f5ba8"/>
+      <stop offset=".79" stop-color="#5f5ba8"/>
+      <stop offset="1" stop-color="#343466"/>
+    </linearGradient>
+  </defs>
+  <g id="Group_285" data-name="Group 285">
+    <g class="cls-2">
+      <g id="Group_284" data-name="Group 284">
+        <path id="Path_434" data-name="Path 434" class="cls-3" d="m19.23,158.48c0,32.19-4.3,58.29-9.62,58.29S0,190.68,0,158.48s4.3-58.29,9.62-58.29,9.62,26.1,9.62,58.29"/>
+        <path id="Path_435" data-name="Path 435" class="cls-7" d="m180.88,158.48c0,32.19-4.3,58.29-9.62,58.29s-9.62-26.1-9.62-58.29,4.3-58.29,9.62-58.29,9.62,26.1,9.62,58.29"/>
+        <path id="Path_430" data-name="Path 430" class="cls-5" d="m174.41,127.88c0,42.32-37.7,131.19-84.2,131.19S6.01,170.2,6.01,127.88s37.7-32.92,84.2-32.92,84.2-9.4,84.2,32.92"/>
+        <path id="Path_431" data-name="Path 431" class="cls-6" d="m25.24,65.6C25.24,44.44,54.33,0,90.21,0s64.97,44.44,64.97,65.6-29.09,23.24-64.97,23.24-64.97-2.08-64.97-23.24"/>
+        <path id="Path_432" data-name="Path 432" class="cls-4" d="m77.53,26.46c1.35,6.62-1.69,13.35-7.55,16.71-5.7,3-11.56.39-13.09-5.83-1.35-6.62,1.69-13.35,7.55-16.71,5.7-3,11.56-.39,13.09,5.83"/>
+        <path id="Path_433" data-name="Path 433" class="cls-4" d="m102.9,26.46c-1.35,6.62,1.69,13.35,7.55,16.71,5.7,3,11.56.39,13.09-5.83,1.35-6.62-1.69-13.35-7.55-16.71-5.7-3-11.56-.39-13.09,5.83"/>
+      </g>
+    </g>
+  </g>
+</svg>
