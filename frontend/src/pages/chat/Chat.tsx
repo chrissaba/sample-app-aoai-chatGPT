@@ -119,13 +119,14 @@ const Chat = () => {
 
         return abortController.abort();
     };
-
+    
     const clearChat = () => {
         lastQuestionRef.current = "";
         setActiveCitation(undefined);
         setAnswers([]);
+        localStorage.removeItem("chatMessages");  // Clear from local storage
     };
-
+    
     const stopGenerating = () => {
         abortFuncs.current.forEach(a => a.abort());
         setShowLoadingMessage(false);
